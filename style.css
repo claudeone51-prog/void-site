@@ -1122,3 +1122,95 @@ footer {
     transition-duration: 0.01ms !important;
   }
 }
+
+#map-section {
+  position: relative;
+  z-index: 1;
+  padding: 160px 24px;
+  border-top: 1px solid #1e1e1e;
+  overflow: hidden;
+}
+
+.map-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 56px;
+  border-bottom: 1px solid #1e1e1e;
+  padding-bottom: 24px;
+}
+
+.map-count {
+  font-family: 'Inter', sans-serif;
+  font-weight: 200;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: #555555;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+#worldMap {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.map-legend {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  transition: opacity 0.3s;
+}
+
+.legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  box-shadow: 0 0 8px rgba(255,255,255,0.4);
+  flex-shrink: 0;
+  animation: dotPulse 3s ease-in-out infinite;
+}
+
+.legend-item:nth-child(1) .legend-dot { animation-delay: 0s; }
+.legend-item:nth-child(2) .legend-dot { animation-delay: 0.6s; }
+.legend-item:nth-child(3) .legend-dot { animation-delay: 1.2s; }
+.legend-item:nth-child(4) .legend-dot { animation-delay: 1.8s; }
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); box-shadow: 0 0 14px rgba(255,255,255,0.6); }
+}
+
+.legend-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 200;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #b8b8b8;
+}
+
+.legend-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 100;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #444444;
+}
+
+@media (max-width: 600px) {
+  .map-legend { gap: 20px; }
+  .map-header { flex-direction: column; gap: 8px; }
+}
