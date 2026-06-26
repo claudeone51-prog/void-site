@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOID — Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --silver: #b8b8b8;
+      --dim: #555555;
+      --border: #1e1e1e;
+      --surface: #0d0d0d;
+    }
+
+    html, body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-weight: 200;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Cursor */
+    body { cursor: none; }
+    .cursor { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: difference; transform: translate(-50%,-50%); transition: transform .15s; }
+    .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; pointer-events: none; z-index: 9998; mix-blend-mode: difference; transform: translate(-50%,-50%); transition: width .3s, height .3s, border-color .3s; }
+
+    /* Particles */
+    #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .45; }
+
+    /* Nav back */
+    .back-link {
+      position: fixed;
+      top: 32px; left: 40px;
+      font-size: 10px;
+      letter-spacing: .28em;
+      color: var(--dim);
+      text-decoration: none;
+      text-transform: uppercase;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color .3s;
+      cursor: none;
+    }
+    .back-link:hover { color: var(--white); }
+
+    /* Layout */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+    }
+
+    .inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0;
+      width: 100%;
+      max-width: 540px;
+    }
+
+    /* Glyph */
+    .glyph {
+      font-size: 44px;
+      font-weight: 100;
+      color: rgba(255,255,255,.18);
+      margin-bottom: 28px;
+      animation: pulse 5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: .18; } 50% { opacity: .35; }
+    }
+
+    /* Product label */
+    .product-label {
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* Title */
+    .title {
+      font-size: clamp(32px, 7vw, 64px);
+      font-weight: 100;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 60px;
+    }
+
+    /* Price card */
+    .price-card {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .price-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.03), transparent 60%);
+      pointer-events: none;
+    }
+    .price-label {
+      font-size: 9px;
+      letter-spacing: .3em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .price-value {
+      font-size: clamp(64px, 12vw, 100px);
+      font-weight: 100;
+      letter-spacing: -.02em;
+      line-height: 1;
+      color: var(--white);
+    }
+
+    /* Includes list */
+    .includes {
+      list-style: none;
+      margin-top: 36px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: left;
+    }
+    .includes li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11px;
+      letter-spacing: .1em;
+      color: var(--silver);
+    }
+    .includes li::before {
+      content: '';
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--dim);
+      flex-shrink: 0;
+    }
+
+    /* Coming soon badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      padding: 14px 32px;
+      font-size: 10px;
+      letter-spacing: .3em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .badge-dot {
+      width: 5px; height: 5px;
+      background: var(--dim);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100% { opacity:.3; } 50% { opacity:1; } }
+
+    /* Note */
+    .note {
+      font-size: 12px;
+      letter-spacing: .06em;
+      color: rgba(255,255,255,.2);
+      line-height: 1.7;
+      max-width: 340px;
+    }
+
+    /* Divider */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 36px 0;
+    }
+
+    /* Email form */
+    .notify-label {
+      font-size: 9px;
+      letter-spacing: .28em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .email-row {
+      display: flex;
+      width: 100%;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 16px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 200;
+      letter-spacing: .08em;
+      color: var(--white);
+    }
+    .email-input::placeholder { color: var(--dim); }
+    .email-btn {
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      padding: 16px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      cursor: none;
+      transition: background .3s;
+      white-space: nowrap;
+    }
+    .email-btn:hover { background: var(--silver); }
+
+    /* Success */
+    .success-msg {
+      display: none;
+      font-size: 11px;
+      letter-spacing: .15em;
+      color: var(--silver);
+      margin-top: 12px;
+    }
+
+    /* Footer */
+    .checkout-footer {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: .25em;
+      color: rgba(255,255,255,.12);
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    /* Ambient glow */
+    .ambient {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(255,255,255,.028) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: ambientPulse 8s ease-in-out infinite;
+    }
+    @keyframes ambientPulse {
+      0%,100% { transform: translate(-50%,-50%) scale(1); opacity:.6; }
+      50% { transform: translate(-50%,-50%) scale(1.2); opacity:1; }
+    }
+
+    @media (max-width: 480px) {
+      .back-link { top: 20px; left: 20px; }
+      .price-card { padding: 36px 24px; }
+      .email-btn { padding: 16px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+  <div class="ambient"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <a href="../index.html" class="back-link" id="backLink">← VOID</a>
+
+  <div class="page">
+    <div class="inner">
+
+      <div class="glyph">Ø</div>
+      <div class="product-label">Void Founding Card</div>
+      <h1 class="title">Reserve Your<br>Number</h1>
+
+      <div class="price-card">
+        <div class="price-label">One-time founding price</div>
+        <div class="price-value">€9</div>
+        <ul class="includes">
+          <li>Numbered physical card — yours permanently</li>
+          <li>Access to the founding community</li>
+          <li>Priority on all future VOID drops</li>
+          <li>Your name in the founders registry</li>
+        </ul>
+      </div>
+
+      <div class="badge">
+        <div class="badge-dot"></div>
+        Payment opening soon
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="notify-label">Notify me when live</div>
+      <div class="email-row">
+        <input class="email-input" type="email" placeholder="your@email.com" id="emailInput" />
+        <button class="email-btn" onclick="handleNotify()">Notify me</button>
+      </div>
+      <div class="success-msg" id="successMsg">You're on the list. The void will find you. Ø</div>
+
+      <p class="note" style="margin-top:32px">
+        100 founding members. No waitlist after launch.<br>No second chance at #001.
+      </p>
+
+    </div>
+  </div>
+
+  <div class="checkout-footer">EVERYTHING BEGINS IN THE VOID</div>
+
+  <script>
+  (() => {
+    // Fix back link path based on current location
+    const back = document.getElementById('backLink');
+    if (window.location.pathname.endsWith('/checkout/') ||
+        window.location.pathname.includes('/checkout/index')) {
+      back.href = '../index.html';
+    } else {
+      back.href = 'index.html';
+    }
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx+'px'; cursor.style.top = my+'px'; });
+    (function animRing() { rx += (mx-rx)*.12; ry += (my-ry)*.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(animRing); })();
+
+    document.querySelectorAll('a,button,input').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.style.width='50px'; ring.style.height='50px'; ring.style.borderColor='rgba(255,255,255,.5)'; });
+      el.addEventListener('mouseleave', () => { ring.style.width='32px'; ring.style.height='32px'; ring.style.borderColor='rgba(255,255,255,.35)'; });
+    });
+
+    // Particles
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let W, H, pts = [];
+    const resize = () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; };
+    resize(); addEventListener('resize', resize);
+
+    for (let i = 0; i < 60; i++) {
+      pts.push({ x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+        vx: (Math.random()-.5)*.12, vy: (Math.random()-.5)*.12,
+        op: Math.random()*.3+.05, life: Math.random()*300, max: Math.random()*300+150 });
+    }
+
+    (function draw() {
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.life++;
+        const hl = p.max/2;
+        const a = p.life < hl ? (p.life/hl)*p.op : ((p.max-p.life)/hl)*p.op;
+        if (p.life > p.max) { p.life=0; p.x=Math.random()*W; p.y=Math.random()*H; }
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${Math.max(0,a)})`; ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    })();
+
+    // Notify
+    window.handleNotify = () => {
+      const val = document.getElementById('emailInput').value;
+      if (!val || !val.includes('@')) {
+        document.getElementById('emailInput').style.borderBottom = '1px solid rgba(255,255,255,.3)';
+        return;
+      }
+      document.querySelector('.email-row').style.opacity = '.4';
+      document.getElementById('successMsg').style.display = 'block';
+    };
+  })();
+  </script>
+</body>
+</html>
