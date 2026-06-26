@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOID — Everything Begins in the Void</title>
+  <meta name="description" content="Can a brand become valuable before it has a product? VOID is an experiment in creating something from nothing." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Particle Canvas -->
+  <canvas id="particles"></canvas>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">Ø</div>
+    <div class="nav-links">
+      <a href="#manifesto">MANIFESTO</a>
+      <a href="#registry">REGISTRY</a>
+      <a href="#join" class="nav-cta">BECOME A FOUNDER</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow reveal">VOID FOUNDING MEMBER · LIMITED TO 100</div>
+      <div class="void-logo reveal-delay-1">
+        <span class="logo-letter">V</span>
+        <div class="logo-o-wrapper">
+          <div class="glow-ring">
+            <div class="ring-inner"></div>
+            <svg class="ring-svg" viewBox="0 0 200 200">
+              <circle class="ring-path" cx="100" cy="100" r="90" />
+              <circle class="ring-glow" cx="100" cy="100" r="90" />
+            </svg>
+          </div>
+        </div>
+        <span class="logo-letter">ID</span>
+      </div>
+      <div class="hero-tagline reveal-delay-2">EVERYTHING BEGINS IN THE VOID</div>
+      <div class="hero-question reveal-delay-3">Can a brand become valuable before it has a product?</div>
+      <a href="#join" class="hero-btn reveal-delay-4">ENTER THE VOID <span class="btn-arrow">→</span></a>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN -->
+  <section id="countdown">
+    <div class="section-inner">
+      <div class="countdown-label reveal">FIRST DROP IN</div>
+      <div class="countdown-grid reveal-delay-1">
+        <div class="countdown-item">
+          <div class="countdown-number" id="days">00</div>
+          <div class="countdown-unit">DAYS</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <div class="countdown-number" id="hours">00</div>
+          <div class="countdown-unit">HOURS</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <div class="countdown-number" id="minutes">00</div>
+          <div class="countdown-unit">MIN</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <div class="countdown-number" id="seconds">00</div>
+          <div class="countdown-unit">SEC</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section id="manifesto">
+    <div class="section-inner manifesto-inner">
+      <div class="manifesto-glyph reveal">Ø</div>
+      <div class="manifesto-text">
+        <p class="manifesto-line reveal">We live in a world full of noise.</p>
+        <p class="manifesto-line reveal-delay-1">VOID exists for people who create.</p>
+        <p class="manifesto-line reveal-delay-2">We start with nothing.</p>
+        <p class="manifesto-line manifesto-bold reveal-delay-3">Everything begins in the void.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3D CARD -->
+  <section id="card-section">
+    <div class="section-inner">
+      <div class="card-label reveal">VOID FOUNDING CARD</div>
+      <div class="card-scene reveal-delay-1">
+        <div class="card-3d" id="card3d">
+          <div class="card-face card-front">
+            <div class="card-top-row">
+              <span class="card-meta">VOID FOUNDING MEMBER</span>
+              <span class="card-number-meta">017 / 100</span>
+            </div>
+            <div class="card-center-logo">
+              <span class="card-logo-letter">V</span>
+              <div class="card-logo-o">
+                <svg viewBox="0 0 80 80" class="card-ring-svg">
+                  <circle class="card-ring-path" cx="40" cy="40" r="34"/>
+                  <circle class="card-ring-glow-path" cx="40" cy="40" r="34"/>
+                </svg>
+              </div>
+              <span class="card-logo-letter">ID</span>
+            </div>
+            <div class="card-bottom-row">
+              <div class="card-holder">
+                <div class="card-name">JOHN SMITH</div>
+                <div class="card-since">MEMBER SINCE 2025</div>
+              </div>
+              <div class="card-icon">Ø</div>
+            </div>
+            <div class="card-shine"></div>
+          </div>
+        </div>
+      </div>
+      <p class="card-desc reveal-delay-2">A physical artefact of your place in the void. Matte black. Brushed metal. Numbered.</p>
+    </div>
+  </section>
+
+  <!-- FOUNDERS REGISTRY -->
+  <section id="registry">
+    <div class="section-inner">
+      <div class="registry-header reveal">
+        <h2 class="section-title">FOUNDERS REGISTRY</h2>
+        <span class="registry-count">3 / 100 REMAINING</span>
+      </div>
+      <div class="registry-table reveal-delay-1">
+        <div class="registry-row registry-reserved">
+          <span class="reg-num">#001</span>
+          <span class="reg-status reserved">RESERVED</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="registry-row registry-reserved">
+          <span class="reg-num">#002</span>
+          <span class="reg-status reserved">RESERVED</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="registry-row registry-reserved">
+          <span class="reg-num">#003</span>
+          <span class="reg-status reserved">RESERVED</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="registry-row registry-available">
+          <span class="reg-num">#004</span>
+          <span class="reg-status available">AVAILABLE</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="registry-row registry-available">
+          <span class="reg-num">#005</span>
+          <span class="reg-status available">AVAILABLE</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="registry-row registry-available">
+          <span class="reg-num">#006</span>
+          <span class="reg-status available">AVAILABLE</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="registry-row registry-available">
+          <span class="reg-num">#007 – #100</span>
+          <span class="reg-status available">97 REMAINING</span>
+          <div class="reg-bar"><div class="reg-bar-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN -->
+  <section id="join">
+    <div class="section-inner join-inner">
+      <div class="join-glyph reveal">Ø</div>
+      <h2 class="join-title reveal-delay-1">BECOME A FOUNDER</h2>
+      <p class="join-sub reveal-delay-2">One card. One number. One chance to be first.</p>
+      <div class="join-price reveal-delay-3">€9</div>
+      <a href="checkout.html" class="join-btn reveal-delay-4">
+        <span>CLAIM YOUR CARD</span>
+        <span class="btn-num">→</span>
+      </a>
+      <p class="join-fine reveal-delay-4">100 founding members. No waitlist. No second chance.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Ø</div>
+      <p class="footer-tag">EVERYTHING BEGINS IN THE VOID</p>
+      <p class="footer-copy">© 2025 VOID. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
