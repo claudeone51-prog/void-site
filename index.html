@@ -57,7 +57,7 @@
       <div class="countdown-label reveal">FIRST DROP IN</div>
       <div class="countdown-grid reveal-delay-1">
         <div class="countdown-item">
-          <div class="countdown-number" id="days">00</div>
+          <div class="countdown-number" id="days">31</div>
           <div class="countdown-unit">DAYS</div>
         </div>
         <div class="countdown-sep">:</div>
@@ -133,34 +133,83 @@
   <div class="section-inner">
     <div class="map-header reveal">
       <h2 class="section-title">FOUNDED WORLDWIDE</h2>
-      <span class="map-count">4 COUNTRIES · GROWING</span>
+      <span class="map-count">4 COUNTRIES · 59 MEMBERS</span>
     </div>
     <div class="map-wrapper reveal-delay-1">
-      <canvas id="worldMap"></canvas>
-      <div class="map-legend reveal-delay-2">
-        <div class="legend-item" data-country="FR">
-          <span class="legend-dot"></span>
-          <span class="legend-name">FRANCE</span>
-          <span class="legend-num">12 members</span>
+      <svg id="worldMapSvg"></svg>
+      <div class="map-legend">
+  <div class="legend-item" style="--i:0">
+    <div class="legend-card">
+      <div class="legend-top">
+        <div class="legend-ping">
+          <span class="legend-ring"></span>
+          <span class="legend-ring" style="animation-delay:.6s"></span>
+          <span class="legend-core"></span>
         </div>
-        <div class="legend-item" data-country="US">
-          <span class="legend-dot"></span>
-          <span class="legend-name">UNITED STATES</span>
-          <span class="legend-num">31 members</span>
-        </div>
-        <div class="legend-item" data-country="DE">
-          <span class="legend-dot"></span>
-          <span class="legend-name">GERMANY</span>
-          <span class="legend-num">9 members</span>
-        </div>
-        <div class="legend-item" data-country="IT">
-          <span class="legend-dot"></span>
-          <span class="legend-name">ITALY</span>
-          <span class="legend-num">7 members</span>
-        </div>
+        <span class="legend-code">US</span>
       </div>
+      <div class="legend-country">United States</div>
+      <div class="legend-bar-wrap">
+        <div class="legend-bar" style="--pct:62%"></div>
+      </div>
+      <div class="legend-count">31 <span>members</span></div>
     </div>
   </div>
+
+  <div class="legend-item" style="--i:1">
+    <div class="legend-card">
+      <div class="legend-top">
+        <div class="legend-ping">
+          <span class="legend-ring" style="animation-delay:.3s"></span>
+          <span class="legend-ring" style="animation-delay:.9s"></span>
+          <span class="legend-core"></span>
+        </div>
+        <span class="legend-code">FR</span>
+      </div>
+      <div class="legend-country">France</div>
+      <div class="legend-bar-wrap">
+        <div class="legend-bar" style="--pct:24%"></div>
+      </div>
+      <div class="legend-count">12 <span>members</span></div>
+    </div>
+  </div>
+
+  <div class="legend-item" style="--i:2">
+    <div class="legend-card">
+      <div class="legend-top">
+        <div class="legend-ping">
+          <span class="legend-ring" style="animation-delay:.6s"></span>
+          <span class="legend-ring" style="animation-delay:1.2s"></span>
+          <span class="legend-core"></span>
+        </div>
+        <span class="legend-code">DE</span>
+      </div>
+      <div class="legend-country">Germany</div>
+      <div class="legend-bar-wrap">
+        <div class="legend-bar" style="--pct:18%"></div>
+      </div>
+      <div class="legend-count">9 <span>members</span></div>
+    </div>
+  </div>
+
+  <div class="legend-item" style="--i:3">
+    <div class="legend-card">
+      <div class="legend-top">
+        <div class="legend-ping">
+          <span class="legend-ring" style="animation-delay:.9s"></span>
+          <span class="legend-ring" style="animation-delay:1.5s"></span>
+          <span class="legend-core"></span>
+        </div>
+        <span class="legend-code">IT</span>
+      </div>
+      <div class="legend-country">Italy</div>
+      <div class="legend-bar-wrap">
+        <div class="legend-bar" style="--pct:14%"></div>
+      </div>
+      <div class="legend-count">7 <span>members</span></div>
+    </div>
+  </div>
+</div>
 </section>
 
   <!-- FOUNDERS REGISTRY -->
