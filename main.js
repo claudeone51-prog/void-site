@@ -295,242 +295,185 @@
   }, { passive: true });
 
 })();
+<script>
 (function initVoidMap() {
-  const canvas = document.getElementById('worldMap');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
-  // Highlighted countries: approximate center coords [lon, lat]
+  // ISO numeric codes (Natural Earth / TopoJSON countries-110m)
   const HIGHLIGHTS = {
-    FR: { lon: 2.3,   lat: 46.2, label: 'FR' },
-    US: { lon: -98.5, lat: 39.5, label: 'US' },
-    DE: { lon: 10.4,  lat: 51.2, label: 'DE' },
-    IT: { lon: 12.5,  lat: 41.9, label: 'IT' },
+    840: { name:'US', lon:-98.5, lat:39.5 },
+    250: { name:'FR', lon:2.3,   lat:46.2 },
+    276: { name:'DE', lon:10.4,  lat:51.2 },
+    380: { name:'IT', lon:12.5,  lat:41.9 },
   };
 
-  // Simplified world SVG path data (Natural Earth low-res)
-  // We'll draw via fetch of a TopoJSON-free approach using an inline SVG path
-  // For a clean self-contained solution, we draw a stylised dot-grid world map
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
+      const s = document.createElement('script');
+      s.src = src; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
 
-  let W, H, DPR;
-  let animFrame = 0;
-  let glowPhase = 0;
-  let dots = [];
+  async function init() {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js');
+    const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
+    render(world);
+  }
 
-  // World dot positions — generated from a geographic bitmask
-  // Lat/Lon grid: we use a curated set of land coordinates
-  const LAND_GRID = generateLandGrid();
+  function render(world) {
+    const svgEl = document.getElementById('worldMapSvg');
+    if (!svgEl) return;
+    const W = svgEl.parentElement.offsetWidth;
+    const H = Math.round(W * 0.5);
 
-  function generateLandGrid() {
-    // Simplified land polygon bitmask at 4-degree resolution
-    // Each entry: [lonMin, lonMax, latMin, latMax]
-    const regions = [
-      // North America
-      [-140,-60,25,70], [-80,-60,5,25], [-120,-60,25,50],
-      // South America
-      [-80,-35,-55,10], [-70,-50,-55,-20],
-      // Europe
-      [-10,40,35,70],
-      // Africa
-      [-18,52,-35,37],
-      // Asia
-      [40,145,-10,70], [100,145,0,50], [60,105,10,40],
-      // Australia
-      [114,154,-40,-10],
-      // Greenland
-      [-55,-18,60,85],
-      // Japan
-      [130,145,30,45],
-      // UK/Ireland (approx)
-      [-8,2,50,60],
-      // Scandinavia
-      [5,32,55,72],
-      // Southeast Asia
-      [95,140,-8,25],
-      // Indonesia
-      [95,141,-8,5],
-      // Madagascar
-      [44,50,-25,-12],
-      // New Zealand (approx)
-      [166,178,-47,-34],
-    ];
+    const svg = d3.select('#worldMapSvg')
+      .attr('viewBox', `0 0 ${W} ${H}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet');
 
-    const grid = [];
-    const step = 3;
-    regions.forEach(([lon0, lon1, lat0, lat1]) => {
-      for (let lon = lon0; lon <= lon1; lon += step) {
-        for (let lat = lat0; lat <= lat1; lat += step) {
-          grid.push([lon + (Math.random()-0.5)*1.5, lat + (Math.random()-0.5)*1.5]);
+    const projection = d3.geoNaturalEarth1()
+      .scale(W / 6.3)
+      .translate([W / 2, H / 2]);
+
+    const path = d3.geoPath().projection(projection);
+
+    // ── Defs ──
+    const defs = svg.append('defs');
+
+    // Country glow filter
+    const gf = defs.append('filter').attr('id','voidCountryGlow')
+      .attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
+    gf.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','5').attr('result','blur');
+    const gm = gf.append('feMerge');
+    gm.append('feMergeNode').attr('in','blur');
+    gm.append('feMergeNode').attr('in','blur');
+    gm.append('feMergeNode').attr('in','SourceGraphic');
+
+    // Dot glow filter
+    const df = defs.append('filter').attr('id','voidDotGlow')
+      .attr('x','-300%').attr('y','-300%').attr('width','700%').attr('height','700%');
+    df.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','3.5').attr('result','b');
+    const dm = df.append('feMerge');
+    dm.append('feMergeNode').attr('in','b');
+    dm.append('feMergeNode').attr('in','b');
+    dm.append('feMergeNode').attr('in','SourceGraphic');
+
+    // Radial gradients for country glow overlays
+    Object.entries(HIGHLIGHTS).forEach(([id, info]) => {
+      const [cx, cy] = projection([info.lon, info.lat]);
+      if (!cx) return;
+      const grad = defs.append('radialGradient')
+        .attr('id', `voidGrad${info.name}`)
+        .attr('cx', cx / W).attr('cy', cy / H)
+        .attr('r', '0.35')
+        .attr('gradientUnits', 'objectBoundingBox');
+      grad.append('stop').attr('offset','0%').attr('stop-color','#ffffff').attr('stop-opacity','0.18');
+      grad.append('stop').attr('offset','100%').attr('stop-color','#ffffff').attr('stop-opacity','0');
+    });
+
+    // ── Ocean ──
+    svg.append('path').datum({type:'Sphere'}).attr('class','sphere').attr('d', path);
+
+    // ── Graticule ──
+    svg.append('path').datum(d3.geoGraticule()()).attr('class','graticule').attr('d', path);
+
+    // ── Countries ──
+    const countries = topojson.feature(world, world.objects.countries);
+
+    svg.selectAll('.country')
+      .data(countries.features)
+      .join('path')
+      .attr('class', d => HIGHLIGHTS[+d.id] ? 'country hl' : 'country')
+      .attr('d', path)
+      .attr('filter', d => HIGHLIGHTS[+d.id] ? 'url(#voidCountryGlow)' : null);
+
+    // ── Highlight glow overlays (pulsing) ──
+    const hlGroup = svg.append('g');
+    countries.features
+      .filter(d => HIGHLIGHTS[+d.id])
+      .forEach(feat => {
+        const info = HIGHLIGHTS[+feat.id];
+        const overlay = hlGroup.append('path')
+          .datum(feat).attr('d', path)
+          .attr('fill', `url(#voidGrad${info.name})`)
+          .attr('stroke', 'none')
+          .attr('pointer-events','none')
+          .attr('opacity', 0);
+
+        function pulseFill() {
+          overlay.transition().duration(2000 + Math.random()*800)
+            .ease(d3.easeSinInOut).attr('opacity', 0.8)
+            .transition().duration(2000 + Math.random()*800)
+            .ease(d3.easeSinInOut).attr('opacity', 0.2)
+            .on('end', pulseFill);
         }
-      }
-    });
-    return grid;
-  }
-
-  function project(lon, lat, w, h) {
-    // Equirectangular projection with slight padding
-    const pad = 0.04;
-    const x = (lon + 180) / 360 * w * (1 - pad*2) + w * pad;
-    const y = (90 - lat) / 180 * h * (1 - pad*2) + h * pad;
-    return [x, y];
-  }
-
-  function isHighlighted(lon, lat) {
-    for (const key of Object.keys(HIGHLIGHTS)) {
-      const h = HIGHLIGHTS[key];
-      const dlon = Math.abs(lon - h.lon);
-      const dlat = Math.abs(lat - h.lat);
-      // Generous radius per country
-      const radius = key === 'US' ? 22 : key === 'FR' ? 10 : key === 'DE' ? 8 : key === 'IT' ? 8 : 0;
-      if (dlon < radius && dlat < radius * 0.7) return key;
-    }
-    return null;
-  }
-
-  function resize() {
-    DPR = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    W = rect.width || canvas.parentElement.offsetWidth;
-    H = Math.round(W * 0.5); // 2:1 aspect ratio
-    canvas.width = W * DPR;
-    canvas.height = H * DPR;
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.scale(DPR, DPR);
-    buildDots();
-  }
-
-  function buildDots() {
-    dots = LAND_GRID.map(([lon, lat]) => {
-      const [x, y] = project(lon, lat, W, H);
-      const hl = isHighlighted(lon, lat);
-      return { x, y, lon, lat, hl, phase: Math.random() * Math.PI * 2 };
-    });
-  }
-
-  function draw(ts) {
-    glowPhase = ts * 0.001;
-    ctx.clearRect(0, 0, W, H);
-
-    // Background: very subtle grid lines
-    ctx.setLineDash([]);
-    ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-    ctx.lineWidth = 0.5;
-    // Latitude lines
-    for (let lat = -60; lat <= 60; lat += 30) {
-      const [, y] = project(0, lat, W, H);
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-    // Longitude lines
-    for (let lon = -120; lon <= 120; lon += 60) {
-      const [x] = project(lon, 0, W, H);
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-
-    // Draw dots
-    dots.forEach(d => {
-      const isHl = !!d.hl;
-      const baseOpacity = isHl ? 0 : 0.18;
-      const size = isHl ? 0 : 1.2;
-
-      if (!isHl) {
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${baseOpacity})`;
-        ctx.fill();
-      }
-    });
-
-    // Draw highlighted country glows
-    const hlGroups = {};
-    dots.forEach(d => {
-      if (d.hl) {
-        if (!hlGroups[d.hl]) hlGroups[d.hl] = [];
-        hlGroups[d.hl].push(d);
-      }
-    });
-
-    Object.entries(hlGroups).forEach(([key, pts]) => {
-      // Find bounding center
-      const cx = pts.reduce((s,p) => s+p.x, 0) / pts.length;
-      const cy = pts.reduce((s,p) => s+p.y, 0) / pts.length;
-
-      // Pulsing glow behind
-      const glowR = key === 'US' ? 80 : 40;
-      const pulse = 0.5 + 0.5 * Math.sin(glowPhase * 1.5 + HIGHLIGHTS[key].lon * 0.1);
-
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR * (1 + pulse * 0.2));
-      grad.addColorStop(0, `rgba(255,255,255,${0.06 + pulse * 0.04})`);
-      grad.addColorStop(0.5, `rgba(255,255,255,${0.02 + pulse * 0.02})`);
-      grad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, glowR * (1 + pulse * 0.2), 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // Dots for this country
-      pts.forEach(d => {
-        const dotPulse = 0.5 + 0.5 * Math.sin(glowPhase * 2 + d.phase);
-        const r = 1.5 + dotPulse * 0.5;
-        const op = 0.6 + dotPulse * 0.4;
-
-        // Outer glow
-        const dg = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, r * 4);
-        dg.addColorStop(0, `rgba(255,255,255,${op * 0.4})`);
-        dg.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, r * 4, 0, Math.PI * 2);
-        ctx.fillStyle = dg;
-        ctx.fill();
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${op})`;
-        ctx.fill();
+        setTimeout(pulseFill, Math.random() * 800);
       });
 
-      // Label
-      const [lx, ly] = project(HIGHLIGHTS[key].lon, HIGHLIGHTS[key].lat, W, H);
-      const labelPulse = 0.7 + 0.3 * Math.sin(glowPhase * 1.5 + HIGHLIGHTS[key].lon * 0.1);
-      ctx.font = `200 ${Math.max(8, W * 0.009)}px Inter, sans-serif`;
-      ctx.letterSpacing = '0.2em';
-      ctx.fillStyle = `rgba(255,255,255,${labelPulse * 0.7})`;
-      ctx.textAlign = 'center';
-      const offset = key === 'US' ? -14 : key === 'DE' ? -10 : key === 'IT' ? 10 : -10;
-      ctx.fillText(key, lx, ly + offset);
-      ctx.letterSpacing = '0';
-    });
+    // ── Country borders (crisp top layer) ──
+    svg.append('path')
+      .datum(topojson.mesh(world, world.objects.countries, (a,b) => a !== b))
+      .attr('class','border')
+      .attr('d', path);
 
-    // Ping rings on country centers
-    Object.entries(HIGHLIGHTS).forEach(([key, h]) => {
-      const [px, py] = project(h.lon, h.lat, W, H);
-      const ringPhase = (glowPhase * 0.7 + Object.keys(HIGHLIGHTS).indexOf(key) * 0.8) % (Math.PI * 2);
-      const progress = (Math.sin(ringPhase) + 1) / 2; // 0 to 1
-      const maxR = key === 'US' ? 28 : 18;
-      const ringR = progress * maxR;
-      const ringOp = (1 - progress) * 0.5;
+    // ── Ping rings + dots ──
+    const pingGroup = svg.append('g');
 
-      if (ringOp > 0.01) {
-        ctx.beginPath();
-        ctx.arc(px, py, ringR, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,255,255,${ringOp})`;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
+    Object.entries(HIGHLIGHTS).forEach(([id, info], i) => {
+      const [px, py] = projection([info.lon, info.lat]);
+      if (!px || !py) return;
+
+      const maxR = info.name === 'US' ? 30 : 18;
+
+      function ring(delay, opacity, dur) {
+        setTimeout(function go() {
+          const r = pingGroup.append('circle')
+            .attr('cx', px).attr('cy', py).attr('r', 3)
+            .attr('fill','none')
+            .attr('stroke', `rgba(255,255,255,${opacity})`)
+            .attr('stroke-width', 0.8)
+            .attr('pointer-events','none');
+          r.transition().duration(dur).ease(d3.easeLinear)
+            .attr('r', maxR)
+            .attr('stroke', 'rgba(255,255,255,0)')
+            .attr('stroke-width', 0.2)
+            .remove()
+            .on('end', () => setTimeout(go, Math.random() * 600 + 200));
+        }, delay);
       }
-    });
 
-    requestAnimationFrame(draw);
+      ring(i * 500,       0.7, 2200);
+      ring(i * 500 + 900, 0.4, 1800);
+
+      // Glow halo
+      pingGroup.append('circle')
+        .attr('cx', px).attr('cy', py)
+        .attr('r', info.name === 'US' ? 7 : 5)
+        .attr('fill','rgba(255,255,255,0.08)')
+        .attr('filter','url(#voidDotGlow)')
+        .attr('pointer-events','none');
+
+      // Core dot
+      pingGroup.append('circle')
+        .attr('cx', px).attr('cy', py).attr('r', 2.5)
+        .attr('fill','#ffffff')
+        .attr('filter','url(#voidDotGlow)')
+        .attr('pointer-events','none');
+
+      pingGroup.append('circle')
+        .attr('cx', px).attr('cy', py).attr('r', 1.2)
+        .attr('fill','#ffffff')
+        .attr('pointer-events','none');
+    });
   }
 
-  // Init
-  // Small delay so layout is settled
-  setTimeout(() => {
-    resize();
-    requestAnimationFrame(draw);
-  }, 200);
-
-  window.addEventListener('resize', () => {
-    resize();
-  });
+  // Lazy init when section enters viewport
+  const section = document.getElementById('map-section');
+  if (!section) return;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { obs.disconnect(); init().catch(console.error); }
+  }, { threshold: 0.05 });
+  obs.observe(section);
 })();
+</script>
+
